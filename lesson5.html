@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FLST - Java EE - Lesson 3</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      @import url(java.css);
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle, inverse
+
+# Java EE et applications Web
+
+## Filters
+
+## Listeners
+
+---
+
+class: center, middle, inverse
+
+# Filters
+
+---
+
+# Filters
+
+> A filter is an object that performs filtering tasks on either the
+request to a resource (a servlet or static content), or on the response
+from a resource, or both.
+
+---
+
+# Filters
+
+Exécuter une action à chaque requête de l'utilisateur
+* Ajout de logs, sécurité, chiffrement, …
+
+Modifier la réponse après le traitement des requêtes
+* Encodage de caractères, compression, …
+
+.pull-left[
+
+### Dans `web.xml`
+```xml
+<filter>
+  <filter-name>MyFilter</filter-name>
+  <filter-class>com.cakes.MyFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>MyFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+]
+
+.pull-right[
+
+### En annotations
+```java
+@WebFilter(urlPatterns="*.do")
+class MyFilter implements Filter {}
+```
+]
+
+---
+
+# Filters - javax.servlet.Filter
+
+
+| Méthode | Description |
+|---------|-------------|
+| `destroy()` | Appelé lors de la destruction du Filter par le conteneur. |
+| `doFilter(ServletRequest, ServletResponse, FilterChain chain)` | Appelé à chaque requête. |
+| `init(FilterConfig filterConfig)` | Appelé lors de la mise en service du Filtre. |
+
+Principe : 
+
+* chaque `Filter` doit appeler `chain.doFilter` pour ne pas briser la chaîne de Filtre.
+* la `Servlet` qui traitera la requête est le dernier maillon de la chaîne
+  - si un `Filter` n'appelle pas la chaîne, la requête ne sera pas traitée
+
+
+---
+
+class: center, middle, inverse
+
+# Listeners
+
+---
+
+# Listeners
+
+Implémentation du pattern [Observer](https://en.wikipedia.org/wiki/Observer_pattern).
+
+Permet d'être notifié lors de certains événements du cycle de vie de l'application :
+
+* déploiement ou destruction de l'application
+* réception ou destruction d'un requête
+
+???
+
+Qu'est-ce qu'un design pattern ?
+
+---
+
+# JSP Standard Tag Library - core
+
+* `out` : afficher une expression
+```xml
+<c:out value="${header['user-agent']}" default="Inconnu"/>
+```
+* `set` : définissions de variable
+```xml
+<c:set scope="session" var="varName" value="${expression}" />
+```
+* `if` : condition simple
+```xml
+<c:if test="${empty param['page']}">
+  Le paramètre page est absent !
+</c:if>
+```
+* `choose`, `when`, `otherwise` : condition complexe
+```xml
+<c:choose>
+  <c:when test="${value==1}"> aff 1 </c:when>
+  <c:when test="${value==2}"> aff 2 </c:when>
+  <c:otherwise>aff ?</c:otherwise>
+</c:choose>
+```
+
+---
+
+# JSP Standard Tag Library - core
+
+* `forEach` : l'itération
+```xml
+<c:forEach var="entry" items="${myCollection}" >
+  <c:out value="${entry}"/><br/>
+</c:forEach>
+```
+* `url`, `param` : la définition d'url
+```xml
+<c:url value="/mapage.jsp">
+  <c:param name="paramName" value="paramValue"/>
+</c:url>
+```
+* Et les autres : `remove`, `redirect`, `import`, `forToken`, `catch`
+
+???
+
+En quoi cela peut-il simplifier les JSP du précédent TP ?
+
+---
+
+# JSP Standard Tag Library - format
+
+La librairie format contient les tags suivants :
+
+* `message`, `param`, `setLocale` : internationalisation
+* `parseDate`, `formatDate` : affichage des dates
+```xml
+<fmt:parseDate value="01/01/2005" pattern="dd/MM/yyyy" var="date"/>
+<fmt:formatDate value="${dateBeans}" pattern="dd/MM/yyyy"/>
+```
+* `parseNumber`, `formatNumber` : affichage des nombres
+```xml
+<fmt:parseNumber value="1250,00" var="num"/>
+<fmt:formatNumber value="15" type="currency" currencySymbol="&euro;"/>
+```
+
+---
+
+class: center, middle, inverse
+
+# Expression Language
+
+---
+
+# Expression Language - définition
+
+>Permet d'accéder directement au contexte de la requête, de la session, ou de la page, **sans utiliser
+de taglib ni de scriptlet.**
+
+* l'EL peut être utilisé avec de nombreuses taglibs (dont la JSTL) pour simplifier leur accès à ces objets
+* l'EL est directement disponible dans les JSP
+
+---
+
+# Expression Language - syntaxe
+
+* Format : `${ expression opérateur expression}`
+* Accès aux propriété d'un objet via le `.` (si bean)
+* Accès aux objet d'une Map via `map[key]`
+* Accès aux objet d'une liste via `list[index]`
+* Opérateurs :less
+  - Numériques : +, -, *, / ou div, % ou mod
+  - Relationnel : ==, >, <, !=, >=, <= ou eq, lt, gt, ne, le, ge
+  - Logique : &&, ||, ! ou and, or, not
+  - Autre : empty
+
+???
+
+Tout le monde sait ce qu'est un bean ?
+
+---
+
+# Expression Language - exemples
+
+```
+${monBean.property}
+${monInt + 2}
+${not empty monBean}
+${maMap[key]}
+${maListe[1]}
+```
+
+---
+
+class: center, middle, inverse
+
+# Et avec la JSTL ?
+
+---
+
+class: center, middle, inverse
+
+# Questions ?
+
+---
+
+class: center, middle, inverse
+
+# Travaux pratiques
+
+---
+
+# TP
+
+* Reprendre l'application de gestion des *Todo lists*
+* En utilisant la JSTL et l'EL, supprimer la totalité des *scriptlets* présents dans les JSP
+
+    </textarea>
+    <script src="remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
