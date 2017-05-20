@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>FLST - Java EE - Lesson 3</title>
+    <title>FLST - Java EE - Lesson 7</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
 @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -182,6 +182,7 @@ tr:not(:last-of-type) {
 
 td {
   padding: 16px 12px 14px;
+  font-size: 0.8em;
 }
 
 thead td {
@@ -225,246 +226,236 @@ class: center, middle, inverse
 
 # Java EE et applications Web
 
-## **J**ava **S**erver **P**ages
-
-## Bibliothèques de Tags (*taglibs*)
-
----
-
-class: center, middle, inverse
-
-# **J**ava **S**erver **P**ages
-
----
-
-# **J**ava **S**erver **P**ages
-
-> La technologie JSP permet de séparer la couche de présentation (HTML) de la couche de traitement dans une application JavaEE.
-
-La version actuelle (Java EE 7) est la 2.3 ([JSR-245](https://jcp.org/en/jsr/detail?id=245)). 
-
----
-
-# **J**ava **S**erver **P**ages
-
-* Une JSP est *presque* un fichier XML
-* Une JSP peut être constituée de
-  - Tags HTML
-  - Tags JSP
-  - Scriptlets (code Java)
-* C'est généralement un fichier en `.jsp`
-* Une JSP est compilée en Servlet par le conteneur
-
-???
-
-D'autres extensions existent (`jspf` pour les fragments).
-
----
-
-# **J**ava **S**erver **P**ages
-
-Les JSP permettent 3 types de tags :
-
-* les directives :
-
-```jsp
-<%@ page ... @>     <!-- Paramètres de page -->
-<%@ include ... @>  <!-- Inclusion d'un autre fichier (JSP, HTML...) -->
-<%@ taglib ... @>   <!-- Déclare l'utilisation d'une taglib -->
-```
-
-* les scriptlets
-
-```jsp
-<% [code Java] %>
-<%= [code Java dont le retour est inséré dans la page] %>
-```
-
-* les tags d'action, reflétant l'utilisation d'une taglib
-
----
-
-# **J**ava **S**erver **P**ages
-
-## Exemple taglib
-
-```xml
-<jsp:useBean id="monBean" scope="session" class="test.MonBean" />
-<jsp:setProperty name="monBean" property="att" value="val"/>
-<jsp:getProperty name="personne" property="nom" />
-<jsp:forward page="forward.htm"/>
-<jsp:include page="bandeau.jsp"/>
-```
-
-???
-
-La taglib `jsp` est la taglib par défaut.
-
----
-
-# **J**ava **S**erver **P**ages
-
-Dans les scriptlets, certaines variables sont définies par défaut :
-
-Variable   | Classe                                   | Description
------------|------------------------------------------|------------------------------------
-`out`      | `javax.servlet.jsp.JspWriter`            | Flux d'écriture de la page générée
-`request`  | `javax.servlet.http.HttpServletRequest`  | Informations de la requête
-`response` | `javax.servlet.http.HttpServletResponse` | Informations de la réponse
-`session`  | `javax.servlet.http.HttpSession`         | Contient les données de session
-
-???
-
-Semblables aux paramètres de la `HttpServlet`
-
----
-
-# **J**ava **S**erver **P**ages
-
-Pour appeller une JSP, il faut lui transmettre une requête.
-
-* directement, en l'appelant par son URL
-* en lui transferrant (`include` ou `forward`) la requête depuis une `Servlet`
-
-```java
-request.getRequestDispatcher("hello.jsp").include(request, response);
-```
-
-???
-
-[javax.servlet.RequestDispatcher](https://docs.oracle.com/javaee/7/api/javax/servlet/RequestDispatcher.html)
+## Rappels : S.O.L.I.D
+## Spring Framework
+## Spring MVC
 
 ---
 
 class: center, middle, inverse
 
-# taglibs
+# S.O.L.I.D
 
 ---
 
-# taglibs - définition
+# S.O.L.I.D
 
-* *Tag Library*
-* Ensemble de balises XML destinées à être utilisées comme tags d'action dans une JSP
-* Composées par :
-  - les classes Java qui implémentent le comportement des tags
-  - un fichier *Tag Library Descriptor* (`.tld`)
-    + Fait le lien entre une balise XML et une classe Java
-* À la compilation de la JSP, les références aux tags sont remplacés par les 
-  appels aux classes Java correspondantes
-
----
-
-# taglibs - utilisation
-
-Pour utiliser une taglib il faut la déclarer par une directive :
-
-```xml
-<%@ taglib uri="/WEB-INF/taglib.tld" prefix="tag-prefix" %>
-```
-
-Il est possible de référencer une fois pour toutes le *TLD* dans le `web.xml` :
-
-```xml
-<taglib>
-  <taglib-uri>taglib-URI</taglib-uri>
-  <taglib-location>/WEB-INF/lib/taglib.jar</taglib-location>
-</taglib>
-```
-
-La directive devient alors :
-
-```xml
-<%@ taglib uri="taglib-URI" prefix="tag-prefix"%>
-```
+|   |   |   |
+|---|---|---|
+| S | Responsabilité unique (Single responsibility principle) | une classe doit avoir une et une seule responsabilité |
+| O | Ouvert/fermé (Open/closed principle) | une classe doit être ouverte à l'extension, mais fermée à la modification |
+| L | Substitution de Liskov (Liskov Substitution Principle) | une instance de type T doit pouvoir être remplacée par une instance de type G, tel que G sous-type de T, sans que cela modifie la cohérence du programme
+| I | Ségrégation des interfaces (Interface segregation principle) | préférer plusieurs interfaces spécifiques pour chaque client plutôt qu'une seule interface générale |
+| D | Inversion des dépendances (Dependency Inversion Principle) | il faut dépendre des abstractions, pas des implémentations |
 
 ---
 
-# taglibs - utilisation
+# Inversion des dépendances
 
-Au sein d'une JSP, la taglib s'appelle simplement :
+Aussi appelé Inversion of Control (*IoC*)
 
-```xml
-<tag-prefix:monTag attribut="valeur"/>
+## Sans IoC
+
+```java
+private MetierService metierService = new MetierServiceImpl(« param »);
+private MetierService metierService = MetierServiceFactory.getInstance().getMetierService("param");
 ```
 
----
+## Avec Ioc
 
-# taglibs - création
+```java
+private MetierService metierService;
 
-Définir le *TLD* :
-
-```xml
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-
-jsptaglibrary_1_1.dtd">
-<taglib>
-  <tag>
-    <name>hello</name>
-    <tag-class>edu.flst.HelloTag</tagclass>
-    <body-content>empty</bodycontent>
-  </tag>
-</taglib>
+public void setMetierService(MetierService metierService) {
+  this.metierService  = metierService;
+}
 ```
 
 ???
 
-* `name` : nom XML du tag
-* `tag-class` : nom complet de la classe Java d'implémentation
-* `body-content` : contenu autorisé au sein du tag (`tagdependent`, `empty` ou `scriptless`)
-
-[D'autres possibilités](https://docs.oracle.com/javaee/5/tutorial/doc/bnamu.html)
+Quels sont les avantages de l'IoC ?
 
 ---
 
-# taglibs - création
+# Hollywood Principle
 
-Implémenter l'interface `javax.servlet.jsp.tagext.Tag`
-
-Type   | Method | Description
--------|--------|------------
-`int`  | `doEndTag()`   | Process the end tag for this instance.
-`int`  | `doStartTag()` | Process the start tag for this instance.
-`Tag`  | `getParent()`  | Get the parent (closest enclosing tag handler) for this tag handler.
-`void` | `release()`    | Called on a Tag handler to release state.
-`void` | `setPageContext(PageContext pc)` | Set the current page context.
-`void` | `setParent(Tag t)` | Set the parent (closest enclosing tag handler) of this tag handler.
-
-La classe [`javax.servlet.jsp.tagext.TagSupport`](https://docs.oracle.com/javaee/7/api/javax/servlet/jsp/tagext/TagSupport.html) donne une implémentation par défaut qu'il est 
-plus simple d'étendre.
+![Hollywood principle](http://image.slidesharecdn.com/hollywoodprinciple-101220075954-phpapp02/95/hollywood-principle-2-728.jpg)
 
 ---
 
-# taglibs - création
+class: center, middle, inverse
 
-`doStartTag()` doit retourner l'une de deux constantes :
-
-* `Tag.EVAL_BODY_INCLUDE` : le corps est évalué et écrit dans la page.
-* `Tag.SKIP_BODY` : le corps du tag est ignoré.
-
-`doEndTag()` doit retourner l'une de deux constantes :
-
-* `Tag.EVAL_PAGE` : le reste de la page est évalué
-* `Tag.SKIP_PAGE` : le reste de la page est ignoré
+# Spring Framework
 
 ---
 
-# taglibs - création
+# Spring Framework
 
-Exemple :
+Spring est un framework Java et un *conteneur d'injection de dépendances*.
+
+Son rôle : s'assurer que chaque classe reçoive la bonne instance de toutes ses dépendances au démarrage de l'application.
+
+La configuration permet de déclarer quelle classe dépend de quoi.
+
+.pull-left[
+
+## XML
+
+```xml
+<bean id="todoRepository" 
+  class="edu.flst.TodoRepositoryImpl">
+  <property name="dataSource" 
+    ref="dataSource" />
+</bean>
+<bean id="todoService" 
+  class="edu.flst.TodoService" >
+  <property name="todoRepository" 
+    ref="todoRepository" />
+</bean>
+```
+]
+
+.pull-right[
+
+## Annotations
 
 ```java
-public class HelloTag extends TagSupport {
-  public int doStartTag() throws JspException {
-    try {
-      pageContext.getOut().println ("Hello World!");
-    } catch (IOException e) {
-      throw new JspException ("I/O Error", e);
-    }
-    return SKIP_BODY;
+@Service
+class TodoServiceImpl {
+//déclaration a la Spring
+@Autowired 
+private TodoRepository todoRepository;
+@Resource("todoRepository") 
+private TodoRepository todoRepository;
+
+//déclaration standard J2EE
+@Inject
+private TodoRepository todoRepository;
+}
+```
+
+]
+
+Rappel de la définition d'un bean, classe constituée uniquement :
+
+* d'attributs
+* de getters/setters
+* du constructeur par défaut
+
+Il est également possible d'instancier les Bean dans une classe Java annotée `@Configuration`
+
+---
+
+# Spring Framework - Bean ?
+
+Pour être éligible à l'injection de dépendances un *bean* doit faire partie du conteneur.
+
+Une classe annotée mais instanciée par le développeur (`new TodoRepositoryImpl`) ne verra pas ses dépendances injectées.
+
+Par défaut, le fichier de configuration est `applicationContext-xml`.
+
+---
+
+class: center, middle, inverse
+
+# Spring MVC
+
+---
+
+# Spring MVC
+
+C'est l'implémentation du MVC par Spring.
+
+Spring MVC est configurable en XML, annotations, Java, etc…
+
+Plusieurs composants de base :
+
+* une `Servlet` nommée `DispatcherServlet` (*Front Controller*)
+* un `ViewResolver` chargé de trouver la vue associée au nom logique retourné par le contrôleur
+* les contrôleurs : classes de l'application annotées `@Controller`
+* les vues (*JSP* ou autre langage de template)
+
+???
+
+Un *Front Controller* est un contrôleur qui s'exécute avant tous les autres.
+Il s'occupe généralement de :
+
+* Initialiser le framework
+* Assainir la requête
+* La transmettre vers le bon contrôleur applicatif (*routing*)
+
+---
+
+# Spring MVC
+
+## `web.xml`
+
+```xml
+<servlet>
+  <servlet-name>MVC</servlet-name>
+  <servlet-class>
+    org.springframework.web.servlet.DispatcherServlet
+  </servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>MVC</servlet-name>
+  <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+```
+
+---
+
+# Spring MVC
+
+## `applicationContext.xml`
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+  <context:component-scan base-package="edu.flst.todo"/>
+  <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value=".jsp"/>
+  </bean>
+</beans>
+```
+
+---
+
+# Spring MVC - Exemple de contrôleur
+
+```java
+@Controller
+public class HelloWorldController {
+
+  @RequestMapping(value="/hello.do", method = RequestMethod.GET)
+  public String sayHello() {
+    return "hello";
+  }
+
+  @RequestMapping(value="/helloYou.do", method = RequestMethod.GET)
+  public ModelAndView sayHelloYou(HttpServletRequest request) {
+    Map<String, Object> model = new HashMap<String, Object>();
+    model.put("name", request.getParameter("name"));
+    return new ModelAndView("hello", model);
+  }
+  
+  @RequestMapping(value="/helloYou.do", method = RequestMethod.GET)
+  public ModelAndView sayHelloYou(@RequestParam String name) {
+    Map<String, Object> model = new HashMap<String, Object>();
+    model.put("name", name);
+    return new ModelAndView("hello", model);
   }
 }
 ```
+
+[Voir la liste des arguments possibles pour un contrôleur.](http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/mvc.html#mvc-ann-arguments)
 
 ---
 
@@ -480,17 +471,18 @@ class: center, middle, inverse
 
 ---
 
-# TP
+# Travaux pratiques
 
-* Reprendre l'application de gestion des *Todo lists*
-* Les modifier pour extraire le code HTML dans des JSP
-  - Les données à afficher peuvent être passées au travers de l'objet requête (`setAttribute`)
-* Écrire une *taglib* permettant d'afficher une action de la todo
-
-```xml
-<todo:action title="Titre de l'action"/>
-```
-
+1. Télécharger [Spring 4.2.2](http://repo.spring.io/release/org/springframework/spring/4.2.2.RELEASE/spring-framework-4.2.2.RELEASE-dist.zip) et ajouter les *jars* (dossier `libs`) aux dépendances du projet TodoList
+1. Enregistrer la `DispatcherServlet` dans le `web.xml`
+1. Créer le fichier `MVC-servlet.xml` à la racine de `WEB-INF`
+1. Annoter les classes `TodoRepositoryImpl` avec `@Repository` et `TodoServiceImpl` avec `@Service`
+  - Puis injecter la classe Repository dans la classe Service, avec `@Autowired`
+1. Désactiver le pattern Singleton dans ces classes
+1. Créer des classes `@Controller` pour remplacer les Servlets
+  - Les vues ne devraient pas avoir besoin de modifications
+1. Créer un *bean* `dataSource` de type `org.h2.jdbcx.JdbcDataSource` configuré avec les paramètres de connexion à la base H2
+  - Puis injecter ce bean dans la classe `TodoRepositoryImpl` pour exécuter les requêtes SQL 
 
     </textarea>
     <script type="text/javascript">
